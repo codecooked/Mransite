@@ -1,5 +1,4 @@
-document.getElementById('userEmail').textContent = 
-      sessionStorage.getItem('userEmail') || 'Summoner';
+
 document.querySelector('.form-container').addEventListener('submit', async function(event) {
     event.preventDefault(); // Prevent the form from submitting the traditional way
 

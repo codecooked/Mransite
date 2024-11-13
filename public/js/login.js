@@ -19,9 +19,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const loginForm = document.getElementById('loginForm');
-if (loginForm) {
-    loginForm.addEventListener('submit', function(event) {
-        event.preventDefault();
+loginForm.addEventListener('submit', function(event) {
+    event.preventDefault();
 
         // Clear previous error messages
         document.getElementById('emailError').textContent = '';
@@ -55,27 +54,28 @@ if (loginForm) {
         const baseUrl = window.location.origin;
 
         // Submit form data
-        fetch('/login', {
+        fetch(`${baseUrl}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email, password: password }),
-            credentials: 'include' // Include credentials for session cookies
+            credentials: 'include'
         })
         .then(response => {
-            return response.json().then(data => {
-                if (!response.ok) {
+            if (response.ok) {
+                return response.json();
+            } else {
+                return response.json().then(data => {
                     throw new Error(data.message || 'Login failed.');
-                }
-                return data;
-            });
+                });
+            }
         })
         .then(data => {
             if (data.success) {
                 // Check user role and redirect accordingly using dynamic base URL
                 if (data.role === 'admin') {
-                    window.location.href = '/admin_dashboard';
+                    window.location.href = `${baseUrl}/admin_dashboard`;
                 } else {
-                    window.location.href = '/dashboard';
+                    window.location.href = `${baseUrl}/dashboard`;
                 }
             } else {
                 document.getElementById('formError').textContent = data.message;
@@ -86,4 +86,3 @@ if (loginForm) {
             document.getElementById('formError').textContent = error.message || 'An error occurred during login.';
         });
     });
-}

@@ -55,7 +55,7 @@ if (loginForm) {
         const baseUrl = window.location.origin;
 
         // Submit form data
-        fetch(`${baseUrl}/login`, {
+        fetch('/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email, password: password }),
@@ -73,9 +73,9 @@ if (loginForm) {
             if (data.success) {
                 // Check user role and redirect accordingly using dynamic base URL
                 if (data.role === 'admin') {
-                    window.location.href = `${baseUrl}/admin_dashboard`;
+                    window.location.href = '/admin_dashboard';
                 } else {
-                    window.location.href = `${baseUrl}/dashboard`;
+                    window.location.href = '/dashboard';
                 }
             } else {
                 document.getElementById('formError').textContent = data.message;

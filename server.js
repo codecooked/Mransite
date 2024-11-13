@@ -249,28 +249,59 @@ app.post('/reset-password', async (req, res) => {
 });
 
 // Sign Up route
-app.post('/signup', validateSignupInput, async (req, res) => {
-    const { email, password } = req.body;
+app.post('/signup', async (req, res) => {
+  const { email, password } = req.body;
 
-    try {
-        const hashedPassword = hashPassword(password);
-        const newUser = {
-            email,
-            password: hashedPassword,
-            createdAt: new Date()
-        };
-
-        await usersCollection.insertOne(newUser);
-        res.json({ success: true, message: 'Account created successfully!' });
-    } catch (error) {
-        if (error.code === 11000) { // Duplicate key error
-            res.status(400).json({ success: false, message: 'Email already registered.' });
-        } else {
-            console.error('Error creating account:', error);
-            res.status(500).json({ success: false, message: 'An internal server error occurred.' });
-        }
+  try {
+    // Check if user already exists
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required.' });
     }
+
+    const existingUser = await usersCollection.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'Email already registered.' });
+    }
+
+    // Validate password strength (optional)
+    if (!isValidPassword(password)) {
+      return res.status(400).json({ success: false, message: 'Password does not meet complexity requirements.' });
+    }
+
+    // Hash the password
+    const hashedPassword = await hashPassword(password);
+
+    // Create the new user object
+    const newUser = {
+      email,
+      password: hashedPassword,
+      createdAt: new Date()
+    };
+
+    // Insert the new user into the database
+    const insertResult = await usersCollection.insertOne(newUser);
+
+    // Check if the insert operation was successful
+    if (insertResult.acknowledged) {
+      res.json({ success: true, message: 'Account created successfully!' });
+    } else {
+      res.status(500).json({ success: false, message: 'Failed to create account.' });
+    }
+  } catch (error) {
+    console.error('Error creating account:', error.stack || error);
+    res.status(500).json({ success: false, message: 'An internal server error occurred.' });
+  }
 });
+function isValidPassword(password) {
+    // Example: Password must be at least 8 characters, contain letters and numbers
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return passwordRegex.test(password);
+  }
+  async function hashPassword(password) {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    return hashedPassword;
+  }
 
 // Login route
 app.post('/login', loginLimiter, async (req, res) => {

@@ -64,7 +64,18 @@ app.use(
         }
     })
 );
+// Enable the trust proxy setting
+app.set('trust proxy', true);
 
+// Your rate limiter setup
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests, please try again later.',
+});
+
+// Apply rate limiting to all requests
+app.use(limiter);
 // Input Validation Middleware
 const validateSignupInput = (req, res, next) => {
     const { email, password } = req.body;

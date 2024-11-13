@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body>
+  <div class="sidebar-welcome">
+    <div class="sidebar-header">
+      <h2>Welcome</h2>
+      <span id="userEmail">To Piltover Archives</span>
+      <div class="status-indicator">System Online</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-title">Piltover Access</div>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="#dashboard" class="nav-link piltover">
+            <span class="material-icons">dashboard</span>
+            Command Center
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#hextech" class="nav-link piltover">
+            <span class="material-icons">auto_awesome</span>
+            Hextech Systems
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-title">Zaun Monitoring</div>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="#surveillance" class="nav-link zaun">
+            <span class="material-icons">visibility</span>
+            Surveillance
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#chemtech" class="nav-link zaun">
+            <span class="material-icons">science</span>
+            Chemtech Levels
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-title">Administration</div>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="#settings" class="nav-link piltover">
+            <span class="material-icons">settings</span>
+            Settings
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#reports" class="nav-link piltover">
+            <span class="material-icons">description</span>
+            Reports
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <a href="/" id="logoutLink" title="Logout">
+      <span class="material-icons">logout</span>
+      Exit System
+    </a>
+  </div>
+    <script src="js/dashboard.js">
+    </script>
+</body>
+</html>

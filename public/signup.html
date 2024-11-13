@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="signup.css" />
+    <title>Sign Up</title>
+</head>
+<body>
+    <form id="signupForm" action="/signup" method="post" class="form-container">
+    <main class="main">
+      <section class="section-login">
+        <div class="container">
+          <img src="images/logo.png" class="logo" alt="Logo" />
+
+          <h1 class="section-title">Create Account</h1>
+
+          <label class="login-user">
+            <span>Email</span>
+            <input type="text" name="email" id="email" class="input" />
+          </label>
+
+          <label class="login-user">
+            <span>Password</span>
+            <input type="password" name="password" id="password" class="input" />
+            <span id="togglePassword" class="password-toggle-icon fas fa-eye"></span>
+            <span id="passwordError" class="error-message"></span>
+          </label>
+
+          <label class="login-user">
+            <span>Confirm Password</span>
+            <input type="password" name="confirmPassword" id="confirmPassword" class="input" />
+            <span id="togglePassword" class="password-toggle-icon fas fa-eye"></span>
+            <span id="confirmPasswordError" class="error-message"></span>
+          </label>
+
+          <div class="social">
+              <div class="facebook">
+                  <i class="fab fa-facebook"></i>
+              </div>
+              <div class="google">
+                  <i class="fab fa-google"></i>
+              </div>
+              <div class="apple">
+                  <i class="fab fa-apple"></i>
+              </div>
+              <div class="xbox">
+                  <i class="fab fa-xbox"></i>
+              </div>
+              <div class="playstation">
+                  <i class="fab fa-playstation"></i>
+              </div>
+          </div>
+
+          <label class="section-checkbox">
+              <input type="checkbox" id="input-checkbox" /> Watched Arcane Yet?
+          </label>
+        </div>
+
+        <div class="container">
+          <button type="submit" class="login-btn" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+              <path
+                d="M438.6 278.6l-160 160C272.4 444.9 264.2 448 256 448s-16.38-3.125-22.62-9.375c-12.5-12.5-12.5-32.75 0-45.25L338.8 288H32C14.33 288 .0016 273.7 .0016 256S14.33 224 32 224h306.8l-105.4-105.4c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0l160 160C451.1 245.9 451.1 266.1 438.6 278.6z"
+              />
+            </svg>
+          </button>
+          <a href="/" class="section-link">already have an account?</a>
+        </div>
+      </section>
+
+      <section class="wallpaper"></section>
+    </main>
+    </form>
+
+    <script src="js/signup.js"></script>
+    </script>
+</body>
+</html>

@@ -273,12 +273,7 @@ app.post('/signup', async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ success: false, message: 'Email already registered.' });
     }
-
-    // Validate password strength (optional)
-    if (!isValidPassword(password)) {
-      return res.status(400).json({ success: false, message: 'Password does not meet complexity requirements.' });
-    }
-
+      
     // Hash the password
     const hashedPassword = await hashPassword(password);
 

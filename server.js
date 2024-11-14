@@ -233,18 +233,33 @@ app.post('/send-password-reset', async (req, res) => {
 app.post('/reset-password', async (req, res) => {
     const { resetKey, newPassword } = req.body;
 
+    // Validate the new password
+    if (!isValidPassword(newPassword)) {
+        return res.status(400).json({ 
+            success: false, 
+            message: 'Password must be at least 8 characters long and contain both letters and numbers.'
+        });
+    }
+
     try {
+        // Find user with valid reset key
         const user = await usersCollection.findOne({
             resetKey: resetKey,
             resetExpires: { $gt: new Date() }
         });
 
         if (!user) {
-            return res.status(400).json({ success: false, message: 'Invalid or expired reset key.' });
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Invalid or expired reset key.' 
+            });
         }
 
-        const hashedPassword = hashPassword(newPassword);
-        await usersCollection.updateOne(
+        // Hash the new password
+        const hashedPassword = await hashPassword(newPassword);
+
+        // Update user's password and remove reset tokens
+        const updateResult = await usersCollection.updateOne(
             { _id: user._id },
             {
                 $set: { password: hashedPassword },
@@ -252,10 +267,23 @@ app.post('/reset-password', async (req, res) => {
             }
         );
 
-        res.json({ success: true, message: 'Your password has been successfully reset.' });
+        if (updateResult.modifiedCount === 1) {
+            res.json({ 
+                success: true, 
+                message: 'Your password has been successfully reset.' 
+            });
+        } else {
+            res.status(500).json({ 
+                success: false, 
+                message: 'Password reset failed.' 
+            });
+        }
     } catch (error) {
         console.error('Error resetting password:', error);
-        res.status(500).json({ success: false, message: 'Error resetting password' });
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error resetting password' 
+        });
     }
 });
 

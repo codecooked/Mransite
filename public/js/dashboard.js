@@ -1,185 +1,98 @@
-// Constants
-const API_ENDPOINTS = {
-    USER_DETAILS: '/user-details',
-    LOGOUT: '/logout',
-    LOGIN: '/login'
-};
-
-// Security utility functions
-const security = {
-    getAuthToken() {
-        return localStorage.getItem('authToken');
-    },
-
-    isAuthenticated() {
-        const token = this.getAuthToken();
-        return !!token;
-    },
-
-    getRequestHeaders() {
-        return {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        };
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', function () {
+    const userEmailElement = document.getElementById('userEmail');
+    const logoutLink = document.getElementById('logoutLink');
+    
+    // Ensure elements exist before adding listeners
+    if (!userEmailElement || !logoutLink) {
+        console.error('Required DOM elements not found');
+        return;
     }
-};
 
-// Enhanced API client
-const api = {
-    async request(endpoint, options = {}) {
-        const defaultOptions = {
+    fetchUserDetails();
+    setupLogoutHandler();
+});
+
+async function fetchUserDetails() {
+    const userEmailElement = document.getElementById('userEmail');
+    
+    try {
+        const response = await fetch('/user-details', {
             credentials: 'include',
-            headers: security.getRequestHeaders(),
-        };
-
-        const config = {
-            ...defaultOptions,
-            ...options,
             headers: {
-                ...defaultOptions.headers,
-                ...(options.headers || {})
+                'Accept': 'application/json'
             }
-        };
+        });
 
-        try {
-            const response = await fetch(endpoint, config);
-            
-            // Handle authentication errors
+        if (!response.ok) {
+            // Handle specific HTTP errors
             if (response.status === 401) {
-                this.handleAuthError();
-                return null;
+                window.location.href = '/login';
+                return;
             }
-
-            // Handle other error status codes
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            return data;
-
-        } catch (error) {
-            console.error(`API request failed for ${endpoint}:`, error);
-            throw error;
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    },
 
-    handleAuthError() {
-        localStorage.removeItem('authToken');
-        window.location.href = API_ENDPOINTS.LOGIN;
-    }
-};
-
-// Enhanced dashboard functionality
-class Dashboard {
-    constructor() {
-        this.userEmailElement = document.getElementById('userEmail');
-        this.logoutLink = document.getElementById('logoutLink');
+        const data = await response.json();
         
-        // Check if required elements exist
-        if (!this.userEmailElement || !this.logoutLink) {
-            throw new Error('Required DOM elements not found');
+        if (data.success && data.user?.email) {
+            userEmailElement.textContent = data.user.email;
+        } else {
+            throw new Error(data.message || 'Invalid response format');
         }
-
-        // Initialize security check
-        this.initSecurityCheck();
-    }
-
-    async initSecurityCheck() {
-        if (!security.isAuthenticated()) {
-            window.location.href = API_ENDPOINTS.LOGIN;
-            return;
-        }
-
-        this.initialize();
-    }
-
-    initialize() {
-        this.fetchUserDetails();
-        this.setupLogoutHandler();
-        this.setupInactivityMonitor();
-    }
-
-    async fetchUserDetails() {
-        try {
-            const data = await api.request(API_ENDPOINTS.USER_DETAILS);
-            
-            if (data?.success && data.user?.email) {
-                this.userEmailElement.textContent = data.user.email;
-            } else {
-                throw new Error(data?.message || 'Invalid response format');
-            }
-        } catch (error) {
-            console.error('Error fetching user details:', error);
-            this.userEmailElement.textContent = 'Error loading user details';
-            this.showError('Failed to load user details. Please refresh the page.');
-        }
-    }
-
-    setupLogoutHandler() {
-        this.logoutLink.addEventListener('click', async (event) => {
-            event.preventDefault();
-            await this.performLogout();
-        });
-    }
-
-    async performLogout() {
-        try {
-            this.logoutLink.disabled = true;
-            
-            await api.request(API_ENDPOINTS.LOGOUT, {
-                method: 'POST'
-            });
-
-            // Clear authentication data
-            localStorage.removeItem('authToken');
-            window.location.href = '/';
-            
-        } catch (error) {
-            console.error('Error during logout:', error);
-            this.logoutLink.disabled = false;
-            this.showError('Logout failed. Please try again.');
-        }
-    }
-
-    setupInactivityMonitor() {
-        let inactivityTimeout;
-        const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 minutes
-
-        const resetTimer = () => {
-            clearTimeout(inactivityTimeout);
-            inactivityTimeout = setTimeout(() => {
-                this.performLogout();
-            }, TIMEOUT_DURATION);
-        };
-
-        // Reset timer on user activity
-        ['mousedown', 'keydown', 'scroll', 'touchstart'].forEach(event => {
-            document.addEventListener(event, resetTimer);
-        });
-
-        resetTimer();
-    }
-
-    showError(message) {
-        const errorContainer = document.createElement('div');
-        errorContainer.className = 'error-message';
-        errorContainer.textContent = message;
+    } catch (error) {
+        console.error('Error fetching user details:', error);
+        userEmailElement.textContent = 'Error loading user details';
         
-        document.body.appendChild(errorContainer);
-        
-        setTimeout(() => {
-            errorContainer.remove();
-        }, 5000);
+        // Optionally show error to user
+        showError('Failed to load user details. Please refresh the page.');
     }
 }
 
-// Initialize dashboard when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
+function setupLogoutHandler() {
+    const logoutLink = document.getElementById('logoutLink');
+    
+    logoutLink.addEventListener('click', async function (event) {
+        event.preventDefault();
+        await performLogout();
+    });
+}
+
+async function performLogout() {
+    const logoutLink = document.getElementById('logoutLink');
+    
     try {
-        new Dashboard();
+        // Disable logout button to prevent double-clicks
+        logoutLink.disabled = true;
+        
+        const response = await fetch('/logout', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Logout failed with status: ${response.status}`);
+        }
+
+        // Successful logout
+        window.location.href = '/';
+        
     } catch (error) {
-        console.error('Dashboard initialization failed:', error);
-        alert('Failed to initialize dashboard. Please refresh the page.');
+        console.error('Error during logout:', error);
+        
+        // Re-enable logout button
+        logoutLink.disabled = false;
+        
+        // Show error to user
+        showError('Logout failed. Please try again.');
     }
-});
+}
+
+// Utility function to show errors to the user
+function showError(message) {
+    showError('Error Pre');
+    alert(message);
+}

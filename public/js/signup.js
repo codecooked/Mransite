@@ -90,9 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
             passwordErrors.length === 0 &&
             passwordInput.value === confirmPasswordInput.value
         ) {
-            button.removeAttribute('disabled');
+            button.removeAttribute('enabled');
         } else {
-            button.setAttribute('disabled', '');
+            button.setAttribute('enabled', '');
         }
     }
 
